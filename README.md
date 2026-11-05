@@ -1,6 +1,6 @@
 # Alagora
 
-App colaborativo para registrar e acompanhar alagamentos em Jundiaí, com chuva por bairro (Open-Meteo) e risco de alagamento calculado no servidor. Feito para a APS de Ciência da Computação (sistemas distribuídos).
+APS - 8º Semestre
 
 ## Como rodar
 
