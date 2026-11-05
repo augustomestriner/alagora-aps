@@ -1,0 +1,72 @@
+name: alagora
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-alagora}
+      POSTGRES_USER: ${POSTGRES_USER:-alagora}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-alagora_local_2026}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  # API sem estado: roda em várias réplicas (padrão 2). O Nginx divide os acessos entre elas
+  # e os eventos chegam a todas pelo canal do banco. Ajuste com API_REPLICAS no .env.
+  api:
+    build: ./server
+    deploy:
+      replicas: ${API_REPLICAS:-2}
+    environment:
+      PORT: 3000
+      PGHOST: db
+      PGPORT: 5432
+      PGDATABASE: ${POSTGRES_DB:-alagora}
+      PGUSER: ${POSTGRES_USER:-alagora}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-alagora_local_2026}
+      SEED_DEMO: ${SEED_DEMO:-true}
+      CORS_ORIGINS: http://localhost,https://localhost,capacitor://localhost
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+  # Serviço coletor: mesmo código-fonte da API, processo e contêiner próprios.
+  # Busca a chuva por bairro, calcula o risco e publica eventos pelo banco.
+  coletor:
+    build: ./server
+    command: ["node", "src/coletor-main.js"]
+    environment:
+      PGHOST: db
+      PGPORT: 5432
+      PGDATABASE: ${POSTGRES_DB:-alagora}
+      PGUSER: ${POSTGRES_USER:-alagora}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-alagora_local_2026}
+      COLETOR_FONTE: ${COLETOR_FONTE:-auto}
+      COLETOR_INTERVALO_S: ${COLETOR_INTERVALO_S:-120}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+  app:
+    build: ./mobile
+    ports:
+      - "${APP_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+volumes:
+  postgres_data:

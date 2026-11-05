@@ -1,0 +1,29 @@
+ALAGORA - APS de Sistemas Distribuidos
+Registro de alagamentos + chuva e risco por bairro de Jundiai
+
+COMO RODAR (Windows)
+1. Extraia a pasta do ZIP.
+2. Abra o Docker Desktop e espere aparecer "Engine running".
+3. Clique duas vezes em INICIAR.bat.
+   A primeira vez demora alguns minutos (download das imagens). Depois sobe rapido.
+4. O navegador abre em http://localhost:8080
+
+Se a porta 8080 estiver ocupada: copie .env.example para .env, troque
+APP_PORT=8080 por outra porta (ex.: 8081) e rode INICIAR.bat de novo.
+
+CONTAS DE TESTE
+Cidadao: demo@alagora.local  / Demo@12345
+Gestao:  admin@alagora.local / Admin@12345
+
+O QUE TESTAR
+- Abra o app em duas janelas e registre uma ocorrencia em uma delas: ela aparece
+  na outra na hora.
+- "Chuva e risco": chuva por bairro (Open-Meteo) e risco de alagamento.
+- Como gestao, em "Status do sistema" > "Simular tempestade", o risco dos bairros
+  sobe a cada ~30 s nas duas janelas.
+
+OUTROS ARQUIVOS
+PARAR.bat         para o sistema (os dados ficam salvos)
+rodar-testes.bat  roda os testes automaticos e sobe o sistema
+medir-falhas.bat  derruba uma replica da API, o coletor e o banco e mede a recuperacao
+README.md e pasta docs: detalhes tecnicos

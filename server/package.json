@@ -1,0 +1,7 @@
+{
+  "name": "alagora-api", "version": "1.0.0", "private": true, "type": "module",
+  "engines": {"node": ">=22.12"},
+  "scripts": {"start": "node src/index.js", "dev": "node --watch src/index.js", "test": "node --test --test-concurrency=1 test/*.test.js"},
+  "dependencies": {"express": "^5.1.0", "pg": "^8.16.0", "zod": "^4.0.0", "@electric-sql/pglite": "^0.3.14"},
+  "devDependencies": {"supertest": "^7.1.0"}
+}

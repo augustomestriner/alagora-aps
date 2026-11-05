@@ -1,0 +1,5 @@
+{
+  "name": "alagora-aps", "version": "1.0.0", "private": true,
+  "description": "Sistema distribuído móvel para registro colaborativo de alagamentos",
+  "scripts": {"dev": "npm run dev --prefix mobile", "api": "npm start --prefix server", "build": "npm run build --prefix mobile", "test": "npm test --prefix server"}
+}
